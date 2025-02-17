@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '@/lib/axios-config';
 import { Plus, Pencil, Trash2, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -32,11 +32,20 @@ export default function AdminDashboard() {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('http://localhost:5001/api/products');
+      console.log('Fetching products...');
+      const response = await api.get('/api/products');
+      console.log('Products received:', response.data);
       setProducts(response.data);
-    } catch (error) {
-      console.error('Fetch error:', error);
-      toast.error('Failed to fetch products');
+    } catch (error: any) {
+      console.error('Fetch error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
+      toast.error(
+        error.response?.data?.message || 
+        'Failed to fetch products. Please check console for details.'
+      );
     }
   };
 
@@ -71,10 +80,10 @@ export default function AdminDashboard() {
       }
 
       const endpoint = editingProduct 
-        ? `http://localhost:5001/api/products/${editingProduct._id}`
-        : 'http://localhost:5001/api/products';
+        ? `/api/products/${editingProduct._id}`
+        : '/api/products';
 
-      const response = await axios({
+      const response = await api({
         method: editingProduct ? 'put' : 'post',
         url: endpoint,
         data: formDataToSend,
@@ -107,7 +116,7 @@ export default function AdminDashboard() {
 
   const handleDelete = async (id: string) => {
     try {
-      await axios.delete(`http://localhost:5001/api/products/${id}`);
+      await api.delete(`/api/products/${id}`);
       toast.success('Product deleted successfully');
       fetchProducts();
     } catch (error) {

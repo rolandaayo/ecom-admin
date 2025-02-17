@@ -1,13 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
   images: { 
-    unoptimized: true,
-    domains: ['images.unsplash.com']
+    domains: ['images.unsplash.com', 'res.cloudinary.com']
   },
   eslint: {
     ignoreDuringBuilds: true,
-  }
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://localhost:5001/api/:path*',
+      },
+    ];
+  },
 }
 
 module.exports = nextConfig
