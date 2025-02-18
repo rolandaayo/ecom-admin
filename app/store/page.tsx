@@ -31,7 +31,7 @@ export default function StorePage() {
         setError(null);
         console.log('Fetching products...');
         
-        const response = await axios.get('http://localhost:5001/api/products', {
+        const response = await axios.get('https://ecom-admin-backend.vercel.app/api/products/api/products', {
           timeout: 5000 // 5 second timeout
         });
         

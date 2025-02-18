@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  images: { 
-    domains: ['images.unsplash.com', 'res.cloudinary.com']
+  images: {
+    domains: ["images.unsplash.com", "res.cloudinary.com"],
   },
   eslint: {
     ignoreDuringBuilds: true,
@@ -9,11 +9,12 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/:path*',
-        destination: 'http://localhost:5001/api/:path*',
+        source: "/api/:path*",
+        destination:
+          "https://ecom-admin-backend.vercel.app/api/products/api/:path*",
       },
     ];
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
