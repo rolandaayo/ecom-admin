@@ -22,6 +22,7 @@ export default function AdminDashboard() {
   const [products, setProducts] = useState<Product[]>([]);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -55,6 +56,7 @@ export default function AdminDashboard() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const formDataToSend = new FormData();
       
@@ -111,6 +113,8 @@ export default function AdminDashboard() {
     } catch (error: any) {
       console.error('Submit error:', error.response?.data || error);
       toast.error(error.response?.data?.message || 'Failed to process product');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -194,16 +198,16 @@ export default function AdminDashboard() {
               required
             />
           </div>
-          <Button type="submit">
+          <Button type="submit" disabled={isLoading}>
             {editingProduct ? (
               <>
                 <Pencil className="w-4 h-4 mr-2" />
-                Update Product
+                {isLoading ? 'Updating...' : 'Update Product'}
               </>
             ) : (
               <>
                 <Plus className="w-4 h-4 mr-2" />
-                Add Product
+                {isLoading ? 'Adding...' : 'Add Product'}
               </>
             )}
           </Button>

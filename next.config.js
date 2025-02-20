@@ -11,8 +11,7 @@ const nextConfig = {
       {
         source: "/api/:path*",
         destination:
-          "https://ecom-admin-backend.vercel.app/api/products/api/:path*",
-      },
+          "http://localhost:5001/api/:path*",      },
     ];
   },
 };
