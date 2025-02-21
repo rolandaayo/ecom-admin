@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '@/lib/axios-config';
 import { ShoppingCart, Search, User, Heart, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -38,9 +38,7 @@ export default function StorePage() {
       try {
         setLoading(true);
         setError(null);
-        const response = await axios.get('http://localhost:5001/api/products', {
-          timeout: 5000
-        });
+        const response = await api.get('/api/products');
         
         if (!Array.isArray(response.data)) {
           throw new Error('Invalid response format');
@@ -49,7 +47,8 @@ export default function StorePage() {
         setProducts(response.data);
         setFilteredProducts(response.data);
       } catch (error: any) {
-        const errorMessage = error.response?.data?.message || error.message || 'Failed to load products';
+        console.error('Fetch error:', error);
+        const errorMessage = error.message || 'Failed to load products';
         setError(errorMessage);
         toast.error(errorMessage);
       } finally {

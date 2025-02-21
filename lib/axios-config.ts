@@ -1,34 +1,60 @@
 import axios from 'axios';
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api/products';
 const api = axios.create({
-  baseURL,
+  baseURL: 'http://localhost:5001',
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
+    'Cache-Control': 'no-cache',
+    'Pragma': 'no-cache'
   },
-  withCredentials: true, // Important for CORS
+  // Add withCredentials for CORS
+  withCredentials: true
 });
 
-// Add request interceptor for debugging
+// Add request interceptor
 api.interceptors.request.use(
   (config) => {
-    console.log('Making request to:', config.url);
+    console.log(`Making ${config.method?.toUpperCase()} request to: ${config.url}`, {
+      headers: config.headers,
+      data: config.data
+    });
     return config;
   },
   (error) => {
-    console.error('Request error:', error);
+    console.error('Request configuration error:', error);
     return Promise.reject(error);
   }
 );
 
-// Add response interceptor for debugging
+// Update response interceptor
 api.interceptors.response.use(
   (response) => {
+    console.log(`Response from ${response.config.url}:`, {
+      status: response.status,
+      data: response.data
+    });
     return response;
   },
   (error) => {
-    console.error('Response error:', error.response || error);
-    return Promise.reject(error);
+    console.error('API Error:', {
+      code: error.code,
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status,
+      config: error.config
+    });
+
+    if (error.code === 'ERR_CONNECTION_REFUSED') {
+      throw new Error('Cannot connect to server. Please ensure the server is running at http://localhost:5001');
+    }
+    if (error.code === 'ECONNABORTED') {
+      throw new Error('Request timeout. Server took too long to respond.');
+    }
+    if (!error.response) {
+      throw new Error('Network error. Please check your connection and server status.');
+    }
+    throw error;
   }
 );
 

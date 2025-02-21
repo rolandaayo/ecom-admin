@@ -57,23 +57,25 @@ export default function AdminDashboard() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    
     try {
       const formDataToSend = new FormData();
       
       // Log the form data being sent
-      console.log('Form data before sending:', {
-        name: formData.name,
-        description: formData.description,
-        price: formData.price,
-        category: formData.category,
-        hasFile: selectedFile !== null
+      console.log('Submitting form data:', {
+        ...formData,
+        file: selectedFile
       });
 
       // Append all form fields
       formDataToSend.append('name', formData.name);
       formDataToSend.append('description', formData.description);
-      formDataToSend.append('price', formData.price);
+      formDataToSend.append('price', formData.price.toString());
       formDataToSend.append('category', formData.category);
+      
+      // Add default arrays if not provided
+      formDataToSend.append('colors', JSON.stringify([]));
+      formDataToSend.append('features', JSON.stringify([]));
       
       if (selectedFile) {
         formDataToSend.append('image', selectedFile);
@@ -81,13 +83,9 @@ export default function AdminDashboard() {
         formDataToSend.append('imageUrl', formData.imageUrl);
       }
 
-      const endpoint = editingProduct 
-        ? `/api/products/${editingProduct._id}`
-        : '/api/products';
-
       const response = await api({
         method: editingProduct ? 'put' : 'post',
-        url: endpoint,
+        url: editingProduct ? `/api/products/${editingProduct._id}` : '/api/products',
         data: formDataToSend,
         headers: { 
           'Content-Type': 'multipart/form-data'
@@ -99,6 +97,7 @@ export default function AdminDashboard() {
       if (response.data) {
         toast.success(editingProduct ? 'Product updated successfully' : 'Product added successfully');
         
+        // Reset form
         setFormData({
           name: '',
           description: '',
@@ -112,7 +111,11 @@ export default function AdminDashboard() {
       }
     } catch (error: any) {
       console.error('Submit error:', error.response?.data || error);
-      toast.error(error.response?.data?.message || 'Failed to process product');
+      toast.error(
+        error.response?.data?.message || 
+        error.message || 
+        'Failed to process product'
+      );
     } finally {
       setIsLoading(false);
     }
